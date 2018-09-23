@@ -71,7 +71,7 @@ class Player(object):
             return '1'
 
     def adjust_avg_sloppy(self):
-        if random.randint(1,20) == 1:
+        if random.randint(1,2000) == 1:
             print("sloppy")
             return self.rand_play()
         else:
@@ -92,7 +92,7 @@ class NFgame(object):
         self.c = c
         self.d = d
         self.player1 = Player(1,'adjust_avg_sloppy')
-        self.player2 = Player(2,'random')
+        self.player2 = Player(2,'adjust_prev')
         self.player1.learn_game(a,b,c,d)
         self.player2.learn_game(a,b,c,d)
 
