@@ -7,6 +7,7 @@ class Player(object):
         self.plays = ['0','1']
         self.memory_self = []
         self.memory_opponent = []
+        self.game_matrix = {}
         self.strat = strat # random, adjust to previous, adjust to average
 
     # Matrix has format
@@ -33,6 +34,8 @@ class Player(object):
             play = self.adjust_prev()
         elif self.strat == 'adjust_avg':
             play = self.adjust_avg()
+        elif self.strat == 'adjust_avg_sloppy':
+            play = self.adjust_avg_sloppy()
         elif self.strat == 'optimal':
             pass
 
@@ -67,6 +70,12 @@ class Player(object):
         else:
             return '1'
 
+    def adjust_avg_sloppy(self):
+        if random.randint(1,20) == 1:
+            print("sloppy")
+            return self.rand_play()
+        else:
+            return self.adjust_avg()
 
     def observe_play(self, play):
         self.memory_opponent.append(play)
@@ -82,8 +91,8 @@ class NFgame(object):
         self.b = b
         self.c = c
         self.d = d
-        self.player1 = Player(1,'adjust_avg')
-        self.player2 = Player(2,'adjust_prev')
+        self.player1 = Player(1,'adjust_avg_sloppy')
+        self.player2 = Player(2,'random')
         self.player1.learn_game(a,b,c,d)
         self.player2.learn_game(a,b,c,d)
 
