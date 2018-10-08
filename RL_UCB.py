@@ -30,10 +30,11 @@ class Distribution(object):
 
 
 class Bandit(object):
-    def __init__(self,num_arms, strat, slots):
+    def __init__(self,num_arms, strat, slots , e = 0.1):
         self.score = 0
         self.k = num_arms
         self.slots = slots
+        self.e = e
         for slot in self.slots:
             if strat == "optimistic":
                 slot.history.append(20 + numpy.random.uniform())
@@ -48,9 +49,9 @@ class Bandit(object):
         self.scores = []
         self.avg_rewards = []
 
-    def play(self, e = 0.1):
+    def play(self):
         if self.strat == "e-greedy" or self.strat=="greedy":
-            if numpy.random.uniform() < e:
+            if numpy.random.uniform() < self.e:
                 print("playing randomly")
                 slot = numpy.random.randint(0,self.k)
             else:
@@ -89,23 +90,26 @@ def make_slots( k):
 
     return slots
 
-k = 5
+k = 20
 slots = make_slots(k)
-#greedy = Bandit(k,"e-greedy")
+greedy = Bandit(k,"e-greedy", copy.deepcopy(slots), e = 0)
 e_greedy = Bandit(k,"e-greedy",copy.deepcopy(slots))
 optimistic = Bandit(k,"optimistic",copy.deepcopy(slots))
 ucb = Bandit(k,"UCB",copy.deepcopy(slots))
 
 rounds = 500
 for i in range(rounds):
+    greedy.play()
     ucb.play()
     e_greedy.play()
     optimistic.play()
 
 
+plt.plot(range(rounds),greedy.avg_rewards, label = "greedy")
 plt.plot(range(rounds),e_greedy.avg_rewards, label='e_greedy')
 plt.plot(range(rounds),optimistic.avg_rewards, label='optimistic')
 plt.plot(range(rounds),ucb.avg_rewards, label='ucb')
 plt.legend()
+plt.grid()
 plt.show()
 
