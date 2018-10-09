@@ -65,7 +65,7 @@ class Bandit(object):
             best_slot = max(self.slots, key=attrgetter("ucb_score"))
             slot = self.slots.index(best_slot)
 
-        print("Playing " + str(self.slots[slot]))
+        #print("Playing " + str(self.slots[slot]))
 
         self.play_slot(slot)
         self.update_ucb_scores()
@@ -93,22 +93,39 @@ def make_slots( k):
 k = 20
 slots = make_slots(k)
 greedy = Bandit(k,"e-greedy", copy.deepcopy(slots), e = 0)
+
+e_greedy1 = Bandit(k,"e-greedy", copy.deepcopy(slots), e = 0.2)
+e_greedy2= Bandit(k,"e-greedy", copy.deepcopy(slots), e = 0.4)
+e_greedy3= Bandit(k,"e-greedy", copy.deepcopy(slots), e = 0.7)
+e_greedy4= Bandit(k,"e-greedy", copy.deepcopy(slots), e = 0.05)
+e_greedy5= Bandit(k,"e-greedy", copy.deepcopy(slots), e = 0.025)
 e_greedy = Bandit(k,"e-greedy",copy.deepcopy(slots))
 optimistic = Bandit(k,"optimistic",copy.deepcopy(slots))
 ucb = Bandit(k,"UCB",copy.deepcopy(slots))
 
-rounds = 500
+rounds = 3000
 for i in range(rounds):
     greedy.play()
     ucb.play()
     e_greedy.play()
+    e_greedy1.play()
+    e_greedy2.play()
+    e_greedy3.play()
+    e_greedy4.play()
+    e_greedy5.play()
     optimistic.play()
 
 
-plt.plot(range(rounds),greedy.avg_rewards, label = "greedy")
-plt.plot(range(rounds),e_greedy.avg_rewards, label='e_greedy')
-plt.plot(range(rounds),optimistic.avg_rewards, label='optimistic')
-plt.plot(range(rounds),ucb.avg_rewards, label='ucb')
+#plt.plot(range(rounds),greedy.avg_rewards, label = "greedy")
+
+plt.plot(range(rounds),e_greedy5.avg_rewards, label='e_greedy, e=0.025')
+plt.plot(range(rounds),e_greedy4.avg_rewards, label='e_greedy, e=0.05')
+plt.plot(range(rounds),e_greedy.avg_rewards, label='e_greedy, e=0.1')
+plt.plot(range(rounds),e_greedy1.avg_rewards, label='e_greedy, e=0.2')
+plt.plot(range(rounds),e_greedy2.avg_rewards, label='e_greedy, e=0.4')
+plt.plot(range(rounds),e_greedy3.avg_rewards, label='e_greedy, e=0.7')
+#plt.plot(range(rounds),optimistic.avg_rewards, label='optimistic')
+#plt.plot(range(rounds),ucb.avg_rewards, label='ucb')
 plt.legend()
 plt.grid()
 plt.show()
