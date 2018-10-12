@@ -102,6 +102,30 @@ class Grid(object):
 
                     delta = min(delta, abs(v - self.rewards[y][x]))
 
+    def improve_policy(self):
+        stable = True
+        for y in range(self.m):
+            for x in range(self.n):
+                b = self.policies[y][x]
+                current_policy_value = self.rewards[y][x]
+                new_rewards = {}
+
+                for dir, prob in self.policies[y][x].items():
+                    new_x = x + self.agent.moves[dir][1]
+                    new_y = y + self.agent.moves[dir][0]
+                    if [new_y, new_x] == self.A:
+                        new_reward = self.rewardA + self.gamma*self.rewards[new_y][new_x]
+                    elif [new_y, new_x] == self.B:
+                        new_reward = self.rewardB + self.gamma*self.rewards[new_y][new_x]
+                    elif 0 <= new_x < 5 and 0 <= new_y < 5:
+                        new_reward = self.gamma*self.rewards[new_y][new_x]
+                    else:
+                        new_reward = self.gamma*self.rewards[y][x] - 1
+
+                    new_rewards[dir] = new_reward
+
+
+
 
 grid = Grid()
 grid.evaluate_policy()
