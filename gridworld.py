@@ -1,6 +1,7 @@
 import numpy
 import copy
 import time
+import operator
 
 class Agent(object):
     def __init__(self,init_x,init_y):
@@ -124,9 +125,35 @@ class Grid(object):
 
                     new_rewards[dir] = new_reward
 
+                new_rewards["current"] = current_policy_value
 
+                best_reward = 0
+                best_dir = None
+                for dir,reward in new_rewards.items():
+                    if reward >= best_reward:
+                        best_reward = reward
+                        best_dir = dir
+
+                print("Best direction is {} with reward {} at x: {}  y: {}".format(best_dir, best_reward, x, y))
+
+                new_policy = {}
+                for possible_move in ['south','north','east','west']:
+                    if possible_move == best_dir:
+                        new_policy[possible_move] = 1
+                    else:
+                        new_policy[possible_move] = 0
+                        
+                if new_policy != self.policies[y][x]:
+                    stable = False
+                    self.policies[y][x] = new_policy
+                else:
+                    stable = True
+
+                if stable:
+                    return
 
 
 grid = Grid()
 grid.evaluate_policy()
 print(grid.rewards)
+grid.improve_policy()
