@@ -2,30 +2,48 @@ import numpy
 import copy
 import time
 import operator
+import sys
 
 class Agent(object):
-    def __init__(self,init_x,init_y):
-        self.current_pos = [init_x,init_y]
+    def __init__(self,init_y,init_x):
+        self.current_pos = [init_y,init_x]
         self.reward = 0
-        self.moves = {'north': [1,0],
-                      'south': [-1,-0],
+        self.moves = {'north': [-1,0],
+                      'south': [1,0],
                       'west' : [0,-1],
                       'east' : [0,1]}
 
     def move(self,dir):
         if dir == 'north':
-            self.current_pos[1] += 1
+            self.current_pos[0] += -1
         elif dir == 'south':
-            self.current_pos[1] -= 1
-        elif dir == 'east':
             self.current_pos[0] += 1
+        elif dir == 'east':
+            self.current_pos[1] += 1
         elif dir == 'west':
-            self.current_pos[0] -= 1
+            self.current_pos[1] += -1
+
+        if self.current_pos[0] == -1:
+            self.current_pos[0] = 0
+
+        if self.current_pos[0] == 5:
+            self.current_pos[0] = 4
+
+        if self.current_pos[1] == -1:
+            self.current_pos[1] = 0
+
+        if self.current_pos[1] == 5:
+            self.current_pos[1] = 4
 
     def rand_move(self):
         choice = numpy.random.choice(['north','west','east','south'])
         self.move(choice)
 
+    def policy_move(self,policy):
+        moves = list(policy.keys())
+        probs = list(policy.values())
+        chosen_move = numpy.random.choice(moves,1,p=probs)
+        self.move(chosen_move)
 
 class Grid(object):
     def __init__(self,m = 5,n = 5,A = [0,1],B=[0,3],resetA=[4,1],resetB=[2,3],policy='random',gamma=0.9):
@@ -51,7 +69,7 @@ class Grid(object):
                           'west'  : 0.25,
                           'east'  : 0.25}
 
-                self.policies[x][y] = copy.deepcopy(policy)
+                self.policies[y][x] = copy.deepcopy(policy)
 
     def check_reward(self):
         if self.agent.current_pos[0] < 0:
@@ -78,11 +96,7 @@ class Grid(object):
         # Policy evaluation
         theta = 0.00000001
         delta = 1
-        grid.init_policies()
-        count = 0
         while delta > theta:
-            count +=1
-            print(count)
             for y in range(self.m):
                 for x in range(self.n):
                     v = self.rewards[y][x]
@@ -99,17 +113,19 @@ class Grid(object):
                         else:
                             sum += prob*(-1 + self.gamma*self.rewards[y][x])
 
-                        self.rewards[y][x] = sum
+                    self.rewards[y][x] = sum
 
                     delta = min(delta, abs(v - self.rewards[y][x]))
 
     def improve_policy(self):
-        stable = True
+        stable = False
         for y in range(self.m):
             for x in range(self.n):
                 b = self.policies[y][x]
                 current_policy_value = self.rewards[y][x]
                 new_rewards = {}
+                if [y,x] == self.A or [y,x] == self.B:
+                    continue
 
                 for dir, prob in self.policies[y][x].items():
                     new_x = x + self.agent.moves[dir][1]
@@ -127,14 +143,14 @@ class Grid(object):
 
                 new_rewards["current"] = current_policy_value
 
-                best_reward = 0
+                best_reward = -sys.maxsize
                 best_dir = None
                 for dir,reward in new_rewards.items():
                     if reward >= best_reward:
                         best_reward = reward
                         best_dir = dir
 
-                print("Best direction is {} with reward {} at x: {}  y: {}".format(best_dir, best_reward, x, y))
+                #print("Best direction is {} with reward {} at x: {}  y: {}".format(best_dir, best_reward, x, y))
 
                 new_policy = {}
                 for possible_move in ['south','north','east','west']:
@@ -142,18 +158,45 @@ class Grid(object):
                         new_policy[possible_move] = 1
                     else:
                         new_policy[possible_move] = 0
-                        
+
                 if new_policy != self.policies[y][x]:
                     stable = False
                     self.policies[y][x] = new_policy
                 else:
                     stable = True
 
-                if stable:
-                    return
+        if stable:
+            return
+        else:
+            self.evaluate_policy()
 
+
+    def print_policies(self):
+        for i in range(len(grid.policies)):
+            for j in range(len(grid.policies[0])):
+                print(self.policies[i][j])
+
+    def generate_episode(self):
+        self.init_policies()
+        start_x = numpy.random.choice(range(5),1)[0]
+        start_y = numpy.random.choice(range(5),1)[0]
+        self.agent = Agent(start_y,start_x)
+        while self.agent.current_pos != self.A or self.agent.current_pos != self.B:
+            current_x = self.agent.current_pos[1]
+            current_y = self.agent.current_pos[0]
+            print(current_x,current_y)
+            current_policy = self.policies[current_y][current_x]
+            self.agent.policy_move(current_policy)
+            if self.agent.current_pos == self.A or self.agent.current_pos == self.B:
+                return
 
 grid = Grid()
-grid.evaluate_policy()
-print(grid.rewards)
-grid.improve_policy()
+# grid.init_policies()
+# grid.evaluate_policy()
+# print(grid.rewards)
+# for i in range(100):
+#     grid.improve_policy()
+#
+# grid.print_policies()
+# print(grid.rewards)
+grid.generate_episode()
