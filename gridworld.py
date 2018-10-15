@@ -14,6 +14,8 @@ class Agent(object):
                       'east' : [0,1]}
 
     def move(self,dir):
+        bump = False
+
         if dir == 'north':
             self.current_pos[0] += -1
         elif dir == 'south':
@@ -25,15 +27,21 @@ class Agent(object):
 
         if self.current_pos[0] == -1:
             self.current_pos[0] = 0
+            bump = True
 
         if self.current_pos[0] == 5:
             self.current_pos[0] = 4
+            bump = True
 
         if self.current_pos[1] == -1:
             self.current_pos[1] = 0
+            bump = True
 
         if self.current_pos[1] == 5:
             self.current_pos[1] = 4
+            bump = True
+
+        return bump
 
     def rand_move(self):
         choice = numpy.random.choice(['north','west','east','south'])
@@ -43,10 +51,10 @@ class Agent(object):
         moves = list(policy.keys())
         probs = list(policy.values())
         chosen_move = numpy.random.choice(moves,1,p=probs)
-        self.move(chosen_move)
+        return self.move(chosen_move)
 
 class Grid(object):
-    def __init__(self,m = 5,n = 5,A = [0,1],B=[0,3],resetA=[4,1],resetB=[2,3],policy='random',gamma=0.9):
+    def __init__(self,m = 5,n = 5,A = [0,1],B=[0,3],resetA=[4,1],resetB=[2,3],policy='random',gamma=1, alfa = 0.1):
         self.m = m
         self.n = n
         self.rewards = numpy.zeros((m,n))
@@ -59,6 +67,7 @@ class Grid(object):
         self.resetB = resetB
         self.policy = policy
         self.gamma = gamma
+        self.alfa = alfa
         self.agent = Agent(0,0)
 
     def init_policies(self):
@@ -181,16 +190,34 @@ class Grid(object):
         start_x = numpy.random.choice(range(5),1)[0]
         start_y = numpy.random.choice(range(5),1)[0]
         self.agent = Agent(start_y,start_x)
-        while self.agent.current_pos != self.A or self.agent.current_pos != self.B:
-            current_x = self.agent.current_pos[1]
-            current_y = self.agent.current_pos[0]
-            print(current_x,current_y)
-            current_policy = self.policies[current_y][current_x]
-            self.agent.policy_move(current_policy)
-            if self.agent.current_pos == self.A or self.agent.current_pos == self.B:
-                return
 
-grid = Grid()
+        while self.agent.current_pos != self.A and self.agent.current_pos != self.B:
+
+            [current_y,current_x ]= self.agent.current_pos
+            current_policy = self.policies[current_y][current_x]
+
+            bump = self.agent.policy_move(current_policy)
+            [new_y, new_x] = self.agent.current_pos
+
+            # if self.agent.current_pos == self.A or self.agent.current_pos == self.B:
+            #     break
+
+            reward = 0.
+
+            if bump:
+                reward = -1.
+
+            self.rewards[current_y][current_x] += self.alfa*(reward + self.gamma*self.rewards[new_y][new_x] - self.rewards[current_y][current_x])
+
+        if self.agent.current_pos == self.A:
+            self.rewards[self.A[0]][self.A[1]] += self.alfa*(10 + self.gamma*self.rewards[self.resetA[0]][self.resetA[1]] - self.rewards[self.A[0]][self.A[1]])
+
+        if self.agent.current_pos == self.B:
+            self.rewards[self.B[0]][self.B[1]] += self.alfa*(5 + self.gamma*self.rewards[self.resetB[0]][self.resetB[1]] - self.rewards[self.B[0]][self.B[1]])
+
+
+
+grid_policy_iteration = Grid()
 # grid.init_policies()
 # grid.evaluate_policy()
 # print(grid.rewards)
@@ -199,4 +226,8 @@ grid = Grid()
 #
 # grid.print_policies()
 # print(grid.rewards)
-grid.generate_episode()
+grid_episodes= Grid()
+for i in range(1000):
+    grid_episodes.generate_episode()
+
+print(grid_episodes.rewards)
