@@ -1,4 +1,5 @@
 import random
+import numpy
 
 class Player(object):
     def __init__(self, id, strat = 'random'):
