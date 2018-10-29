@@ -43,6 +43,7 @@ class Agent(object):
             self.current_pos = [start_y,start_x]
             bump = True
 
+        # print("Moved from {} to {}".format([start_y,start_x],self.current_pos))
         return bump,dir
 
     def rand_move(self):
