@@ -40,8 +40,7 @@ class CliffWorld(object):
     def isTerminated(self):
         if self.currentPosition in self.cliffStates:
             self.terminated = True
-        elif self.currentPosition in self.goalState:
-            print("Found the goal state!")
+        elif self.currentPosition == self.goalState:
             self.terminated = True
         return self.terminated
 
@@ -49,7 +48,7 @@ class CliffWorld(object):
         directions = list(self.policy[self.currentPosition[0]][self.currentPosition[1]].keys())
         probabilities = list(self.policy[self.currentPosition[0]][self.currentPosition[1]].values())
         pMove = numpy.random.choice(directions, 1, p=probabilities)
-        return pMove
+        return pMove[0]
 
     def getOptimalQ(self, position):
         currentBest = -10000000
@@ -88,11 +87,8 @@ class CliffWorld(object):
     def playEpisode(self):
         self.currentPosition = self.startState
         while not self.isTerminated():
-            #print(self.currentPosition)
-            previousPosition = self.currentPosition
-            direction = self.getOptimalQ(self.currentPosition)[0]
-            #direction = self.policyMove() how do we use this instead of optimalQ
-            #print("going " + direction)
+            previousPosition = [self.currentPosition[0], self.currentPosition[1]]
+            direction = self.policyMove()
             self.move(direction) # updates currentPosition!
             reward = -1
             if self.currentPosition in self.cliffStates:
@@ -100,22 +96,17 @@ class CliffWorld(object):
             elif self.currentPosition == self.goalState:
                 reward = 10
             self.accumulatedReward += reward
-            #print("new values")
-            #print(self.qValue[previousPosition[0]][previousPosition[1]][direction])
-            #print(self.getOptimalQ(self.currentPosition)[1])
             self.qValue[previousPosition[0]][previousPosition[1]][direction] += self.alpha * (reward + self.getOptimalQ(self.currentPosition)[1] - self.qValue[previousPosition[0]][previousPosition[1]][direction])
-            #print(self.qValue[previousPosition[0]][previousPosition[1]][direction])
 
     def QLearning(self):
-        for i in range(100):
+        for episode in range(5000):
             self.terminated = False
-            self.currentPosition = self.startState
             self.accumulatedReward = 0
             self.playEpisode()
-            #print("final " + str(example.accumulatedReward))
 
 example = CliffWorld()
-#example.playEpisode()
 example.QLearning()
-print("final " + str(example.accumulatedReward))
-print(example.qValue)
+print("final q values")
+for row in range(6):
+    for column in range(10):
+        print("[" + str(row) + ", " + str(column) + "] :" + str(example.qValue[row][column]))
