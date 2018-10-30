@@ -1,5 +1,7 @@
 import numpy
 import copy
+import random
+import sys
 
 class Agent(object):
     def __init__(self,init_y,init_x):
@@ -10,7 +12,7 @@ class Agent(object):
                       'west' : [0,-1],
                       'east' : [0,1]}
 
-    def move(self,dir, limit = 5, walls = []):
+    def move(self,dir):
         bump = False
         [start_y,start_x] = self.current_pos
 
@@ -22,28 +24,9 @@ class Agent(object):
             self.current_pos[1] += 1
         elif dir == 'west':
             self.current_pos[1] += -1
-
-        if self.current_pos[0] == -1:
-            self.current_pos[0] = 0
+        elif dir == None:
             bump = True
 
-        if self.current_pos[0] == limit:
-            self.current_pos[0] = limit - 1
-            bump = True
-
-        if self.current_pos[1] == -1:
-            self.current_pos[1] = 0
-            bump = True
-
-        if self.current_pos[1] == limit:
-            self.current_pos[1] = limit - 1
-            bump = True
-
-        if self.current_pos in walls:
-            self.current_pos = [start_y,start_x]
-            bump = True
-
-        # print("Moved from {} to {}".format([start_y,start_x],self.current_pos))
         return bump,dir
 
     def rand_move(self):
@@ -55,6 +38,41 @@ class Agent(object):
         probs = list(policy.values())
         chosen_move = numpy.random.choice(moves,1,p=probs)
         return self.move(chosen_move)
+
+    def get_possible_new_s(self, current_pos):
+        [current_y, current_x] = current_pos
+        possible_s = []
+        possible_s.append(([current_y - 1, current_x], 'north'))
+        possible_s.append(([current_y + 1, current_x], 'south'))
+        possible_s.append(([current_y, current_x - 1], 'west'))
+        possible_s.append(([current_y, current_x + 1], 'east'))
+
+        return possible_s
+
+
+
+    def select_e_greedily(self, current_pos, Qmat, e = 0.1):
+        rand = random.uniform(0,1)
+        max_dir = None
+        [y,x] = current_pos
+        choices = Qmat[y][x]
+        if rand < e:
+            # Select random move
+            dir = random.choice(list(choices.keys()))
+        else:
+            max_q = -sys.maxsize
+            best_moves = []
+            # Select best move
+            for direction in choices.keys():
+                q = choices[direction]
+                if q >= max_q:
+                    max_q = q
+                    max_dir  = direction
+                    best_moves.append(direction)
+
+            dir = random.choice(best_moves)
+
+        return dir
 
 class Grid(object):
     def __init__(self,m = 5,n = 5,A = [0,1],B=[0,3],resetA=[4,1],resetB=[2,3],policy='random',gamma=0.9, alfa = 0.2):
@@ -101,7 +119,7 @@ class Grid(object):
             self.agent.current_pos = self.resetB
 
     def play(self):
-        if selfpolicy == 'random':
+        if self.policy == 'random':
             self.agent.rand_move()
 
     def evaluate_policy(self):
