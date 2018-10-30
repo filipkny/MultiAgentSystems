@@ -3,10 +3,10 @@ import random
 import numpy as np
 import copy
 import sys
-import pprint
+from collections import defaultdict
 
 class Gridwall(object):
-    def __init__(self,walls, treasure, snake_pit,size=8, alfa=0.1, gamma = 0.9):
+    def __init__(self,walls, treasure, snake_pit,size=8, alfa=0.1, gamma = 1):
         self.size = size
         self.walls = walls
         self.treasure = treasure
@@ -62,57 +62,44 @@ class Gridwall(object):
 
     def init_Qmat(self):
         self.Qmat = []
-        choice = {
+
+        for y in range(self.size):
+            self.Qmat.append([])
+            for x in range(self.size):
+                self.Qmat[y].append({
+                    'north':0,
+                    'south': 0,
+                    'east': 0,
+                    'west': 0,
+                })
+
+        self.Qmat[self.treasure[0]][self.treasure[1]] = {
             'north': 0,
             'south': 0,
             'east': 0,
             'west': 0,
         }
 
-        for y in range(self.size):
-            self.Qmat.append([])
-            for x in range(self.size):
-                self.Qmat[y].append(copy.deepcopy(choice))
+        self.Qmat[self.snake_pit[0]][self.snake_pit[1]] = {
+            'north': 0,
+            'south': 0,
+            'east': 0,
+            'west': 0,
+        }
 
-    def get_possible_new_s(self, current_pos):
-        [current_y, current_x] = current_pos
-        possible_s = []
-        dir = None
-        if current_y - 1 >= 0:
-            possible_s.append(([current_y - 1,current_x],'north'))
-        if current_y + 1 < self.size:
-            possible_s.append(([current_y + 1,current_x],'south'))
-        if current_x - 1 >= 0:
-            possible_s.append(([current_y ,current_x - 1],'west'))
-        if current_x + 1 < self.size:
-            possible_s.append(([current_y,current_x + 1],'east'))
+    def get_tile_in_direction(self,pos, dir):
+        new_pos = copy.deepcopy(pos)
 
-        return possible_s
+        if dir == 'north':
+            new_pos[0] += -1
+        elif dir == 'south':
+            new_pos[0] += 1
+        elif dir == 'east':
+            new_pos[1] += 1
+        elif dir == 'west':
+            new_pos[1] += -1
 
-    def select_e_greedily(self, current_pos, e = 0.5):
-        rand = random.uniform(0,1)
-        possible_s= self.get_possible_new_s(current_pos)
-        max_dir = None
-
-        if rand < e:
-            (new_s,dir) = random.choice(possible_s)
-        else:
-            max_q = -sys.maxsize
-            max_s = [None,None]
-            for s,dir in possible_s:
-                y = s[0]
-                x = s[1]
-                choices = self.Qmat[y][x]
-                q = choices[dir]
-                if q > max_q:
-                    max_q = q
-                    max_s = s
-                    max_dir  = dir
-
-            new_s= max_s
-            dir = max_dir
-
-        return new_s,dir
+        return new_pos
 
     def print_best_policies(self):
         best_policies = []
@@ -130,70 +117,102 @@ class Gridwall(object):
                         max_q = q
                         max_dir = dir
 
-                best_policies[y].append((max_dir,max_q))
+                best_policies[y].append(max_dir)
                 sum_best_policies[y].append(round(sum(choices.values()),2))
 
-        #pprint.pprint(best_policies,compact=True)
-        print(np.matrix(sum_best_policies))
+        best_policies = np.matrix(best_policies)
 
-    def generate_episode(self, printing=True):
+        sum_best_policies = np.matrix(sum_best_policies)
+
+        return best_policies,sum_best_policies
+
+    def print_final_policies(self):
+        best_policies, sum_best_policies = self.print_best_policies()
+        for wall in walls:
+            best_policies[wall[0],wall[1]] = 'WALL'
+            sum_best_policies[wall[0],wall[1]] = '-1'
+
+        best_policies[self.snake_pit[0],self.snake_pit[1]] = 'SNAKE'
+        sum_best_policies[self.snake_pit[0],self.snake_pit[1]] = -0.000
+
+        best_policies[self.treasure[0], self.treasure[1]] = 'TREASURE'
+        sum_best_policies[self.treasure[0], self.treasure[1]] = -0.000
+
+        print(best_policies)
+        print(sum_best_policies)
+
+        return self.Qmat
+
+    def check_bump(self, pos, walls, border = 8):
+        if pos not in walls and 0 <= pos[0] < border  and 0 <= pos[1] < border:
+            return False
+        else:
+            return True
+
+    def generate_episode(self, algorithm = 'sarsa', printing=True):
 
         # Initialize s
         self.init_agent()
-
         # Choose a from s using policy derived from Q, e-greedy
-        new_s, dir = self.select_e_greedily(self.agent.current_pos)
+        dir = self.agent.select_e_greedily(self.agent.current_pos, self.Qmat)
 
-        from collections import defaultdict
-        positions = defaultdict(int)
-        count = 0
+        counter = 0
 
         # Repeat for each step
-        while self.agent.current_pos != self.snake_pit and self.agent.current_pos != self.treasure:
-
-            count += 1
-            positions[str(self.agent.current_pos)] += 1
-            # if count == 100000:
-            #     pprint.pprint(positions)
-            #     quit()
-
+        while True:
+            counter += 1
             [current_y, current_x] = self.agent.current_pos
+
+            s_slash = self.get_tile_in_direction(self.agent.current_pos, dir)
             if printing:
                 print(" --------- NEW STEP ----------")
-                print("Current q: {}".format(self.Qmat[current_y][current_x]))
-                print("Agent at {} with dir: {} --> {}".format(self.agent.current_pos,dir,new_s))
+                print("Agent at {} with dir: {} --> {}".format(self.agent.current_pos,dir,s_slash))
 
-            # Take action a, obesrve r,s'
-            bumped,dir = self.agent.move(dir, limit=self.size, walls=self.walls)
-
+            # Take action a, observe reward, s'
+            bumped = self.check_bump(s_slash,self.walls)
             if bumped:
-                if printing:
-                    print("We bumped into {} so we are still at {}".format(new_s,self.agent.current_pos))
-                new_s = [current_y, current_x]
+                s_slash = self.agent.current_pos
+            reward = self.check_reward(s_slash,bumped)
 
-            reward = self.check_reward(self.agent.current_pos, bumped)
-
-            if printing:
-                print("Recieved reward {} and currently at {} (bumped: {})".format(reward,self.agent.current_pos,bumped))
 
             # Choose a' from s' using policy derived from Q, e-greedy
-            new_new_s,new_dir = self.select_e_greedily(self.agent.current_pos)
+            new_dir = self.agent.select_e_greedily(s_slash, self.Qmat)
+            [new_y, new_x] = s_slash
+
+            if algorithm == 'sarsa':
+                update_dir = new_dir
+                [update_y, update_x] = [new_y, new_x]
+            else:
+                update_dir = self.agent.select_e_greedily(s_slash, self.Qmat, e=0)
+                [update_y, update_x] = s_slash
+
 
             if printing:
-                print("Next move is dir: {} to go to {}".format(new_dir,new_new_s))
+                print("Recieved reward {} (bumped at {}: {})".format(reward,self.agent.current_pos,bumped))
 
-            [new_y,new_x] = new_new_s
 
+            if printing:
+                print("a_slash is {}".format(new_dir))
 
             # Update Q
             self.Qmat[current_y][current_x][dir] += self.alfa*\
-                                              (reward + self.gamma*self.Qmat[new_y][new_x][new_dir] -
+                                              (reward + self.gamma*self.Qmat[update_y][update_x][update_dir] -
                                                self.Qmat[current_y][current_x][dir])
+
 
             if printing:
                 print("After updating Q for y:{} and x:{} it looks like:{}".format(current_y,current_x,self.Qmat[current_y][current_x]))
+                print("Updating with {}".format(self.alfa*\
+                                              (reward + self.gamma*self.Qmat[update_y][update_x][update_dir] -
+                                               self.Qmat[current_y][current_x][dir])))
             dir = new_dir
-            new_s = new_new_s
+            self.agent.current_pos = s_slash
+
+            if printing:
+                print("Now at {}".format(self.agent.current_pos))
+
+            if self.agent.current_pos == self.snake_pit or self.agent.current_pos == self.treasure:
+                break
 
 walls = [[1,2],
          [1,3],
@@ -212,8 +231,9 @@ snake_pit = [5,4]
 world = Gridwall(walls,treasure,snake_pit)
 world.init_policies()
 world.init_Qmat()
-world.print_best_policies()
-for i in range(1000):
-    print("\n")
-    world.generate_episode(printing=False)
-    world.print_best_policies()
+for i in range(100000):
+    print("Episode {}".format(i))
+    world.generate_episode(algorithm='q',printing=False)
+   # world.print_best_policies()
+
+qmat = world.print_final_policies()
