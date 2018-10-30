@@ -29,7 +29,7 @@ class CliffWorld(object):
     def e_greedy(self, position):
         directions = list(self.qValue[position[0]][position[1]].keys())
         equiprobablePolicy = [0.25, 0.25, 0.25, 0.25]
-        if numpy.random.choice(100, 1)[0] == 1:
+        if numpy.random.choice(1000, 1)[0] == 1:
             chosenDirection = numpy.random.choice(directions, 1, p=equiprobablePolicy)[0]
             return [chosenDirection, self.qValue[position[0]][position[1]][chosenDirection]]
         else:
