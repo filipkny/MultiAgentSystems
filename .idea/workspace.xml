@@ -3,8 +3,12 @@
   <component name="ChangeListManager">
     <list default="true" id="8d8a8c46-92fe-4549-be48-f32638268144" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+<<<<<<< HEAD
       <change beforePath="$PROJECT_DIR$/Gridworld.py" beforeDir="false" afterPath="$PROJECT_DIR$/Gridworld.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/gridwalls.py" beforeDir="false" afterPath="$PROJECT_DIR$/gridwalls.py" afterDir="false" />
+=======
+      <change beforePath="$PROJECT_DIR$/CliffWalking.py" beforeDir="false" afterPath="$PROJECT_DIR$/CliffWalking.py" afterDir="false" />
+>>>>>>> b4a65a44280e8ae07a113eb32fb29a79903ac252
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -15,9 +19,13 @@
   <component name="CoverageDataManager">
     <SUITE FILE_PATH="coverage/simulations$RL_UCB.coverage" NAME="RL_UCB Coverage Results" MODIFIED="1538980494152" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/MultiAgentSystems$gridwalls.coverage" NAME="gridwalls Coverage Results" MODIFIED="1540799503673" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+<<<<<<< HEAD
     <SUITE FILE_PATH="coverage/simulations$gridwalls.coverage" NAME="gridwalls Coverage Results" MODIFIED="1540924503586" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/MultiAgentSystems$CliffWalking.coverage" NAME="CliffWalking Coverage Results" MODIFIED="1540809498259" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/simulations$Gridworld.coverage" NAME="Gridworld Coverage Results" MODIFIED="1540918756036" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+=======
+    <SUITE FILE_PATH="coverage/MultiAgentSystems$CliffWalking.coverage" NAME="CliffWalking Coverage Results" MODIFIED="1540923087349" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+>>>>>>> b4a65a44280e8ae07a113eb32fb29a79903ac252
   </component>
   <component name="FUSProjectUsageTrigger">
     <session id="-545318545">
@@ -55,31 +63,36 @@
     <session id="-48706026">
       <usages-collector id="statistics.lifecycle.project">
         <counts>
+          <entry key="project.closed" value="3" />
           <entry key="project.open.time.3" value="1" />
-          <entry key="project.opened" value="1" />
+          <entry key="project.open.time.6" value="1" />
+          <entry key="project.open.time.7" value="1" />
+          <entry key="project.open.time.8" value="1" />
+          <entry key="project.opened" value="4" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.extensions.open">
         <counts>
-          <entry key="py" value="5" />
+          <entry key="py" value="6" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.types.open">
         <counts>
-          <entry key="Python" value="5" />
+          <entry key="Python" value="6" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.extensions.edit">
         <counts>
           <entry key="Python Console" value="239" />
-          <entry key="dummy" value="16" />
-          <entry key="py" value="3022" />
+          <entry key="dummy" value="27" />
+          <entry key="py" value="4550" />
+          <entry key="txt" value="408" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.types.edit">
         <counts>
-          <entry key="PLAIN_TEXT" value="16" />
-          <entry key="Python" value="3261" />
+          <entry key="PLAIN_TEXT" value="435" />
+          <entry key="Python" value="4789" />
         </counts>
       </usages-collector>
     </session>
@@ -89,6 +102,7 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/gridwalls.py">
           <provider selected="true" editor-type-id="text-editor">
+<<<<<<< HEAD
             <state relative-caret-position="380">
               <caret line="233" column="21" selection-start-line="233" selection-start-column="21" selection-end-line="233" selection-end-column="21" />
               <folding>
@@ -97,6 +111,38 @@
                 <marker date="1540925555780" expanded="true" signature="3669:4252" ph="..." />
                 <marker date="1540925555780" expanded="true" signature="4297:4306" ph="..." />
                 <marker date="1540925555780" expanded="true" signature="4440:4446" ph="..." />
+=======
+            <state relative-caret-position="6512">
+              <caret line="181" column="24" selection-start-line="181" selection-start-column="24" selection-end-line="181" selection-end-column="24" />
+              <folding>
+                <element signature="e#0#27#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/Gridworld.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="1924">
+              <caret line="53" column="23" selection-start-line="53" selection-start-column="23" selection-end-line="53" selection-end-column="23" />
+              <folding>
+                <element signature="e#0#12#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/CliffWalking.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="74">
+              <caret line="2" lean-forward="true" selection-start-line="2" selection-end-line="2" />
+              <folding>
+                <element signature="e#0#12#0" expanded="true" />
+                <marker date="1540923085461" expanded="true" signature="53:58" ph="..." />
+                <marker date="1540923085461" expanded="true" signature="834:835" ph="..." />
+>>>>>>> b4a65a44280e8ae07a113eb32fb29a79903ac252
               </folding>
             </state>
           </provider>
@@ -315,6 +361,28 @@
       <option name="presentableId" value="Default" />
       <updated>1538743944992</updated>
     </task>
+    <task id="LOCAL-00001" summary="Created first draft for the CliffWorld task (6.9)&#10;&#10;-episodes are running and rewards are correctly accumulated&#10;-does not find goal state yet! (for less than 100 episodes)">
+      <created>1540809652864</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1540809652864</updated>
+    </task>
+    <task id="LOCAL-00002" summary="Made CliffWorld task workable&#10;&#10;-using equiprobable policy and 5000 episodes, map of q values shows what I would expect">
+      <created>1540845805113</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1540845805113</updated>
+    </task>
+    <task id="LOCAL-00003" summary="Tried some error fixing while accessing dictionary in matrix list. Not yet workable.">
+      <created>1540880104469</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1540880104469</updated>
+    </task>
+    <option name="localTasksCounter" value="4" />
     <servers />
   </component>
   <component name="ToolWindowManager">
@@ -325,17 +393,28 @@
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" />
+<<<<<<< HEAD
       <window_info anchor="bottom" id="Run" order="2" weight="0.3664865" />
       <window_info anchor="bottom" id="Debug" order="3" weight="0.4" />
+=======
+      <window_info active="true" anchor="bottom" id="Run" order="2" sideWeight="0.49959677" visible="true" weight="0.36221123" />
+      <window_info anchor="bottom" id="Debug" order="3" weight="0.39933994" />
+>>>>>>> b4a65a44280e8ae07a113eb32fb29a79903ac252
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
       <window_info anchor="bottom" id="TODO" order="6" />
       <window_info anchor="bottom" id="Docker" order="7" show_stripe_button="false" />
       <window_info anchor="bottom" id="Version Control" order="8" show_stripe_button="false" />
       <window_info anchor="bottom" id="Database Changes" order="9" show_stripe_button="false" />
+<<<<<<< HEAD
       <window_info anchor="bottom" id="Event Log" order="10" side_tool="true" />
       <window_info anchor="bottom" id="Terminal" order="11" weight="0.32972974" />
       <window_info active="true" anchor="bottom" id="Python Console" order="12" visible="true" weight="0.44324324" />
+=======
+      <window_info anchor="bottom" id="Event Log" order="10" sideWeight="0.5004032" side_tool="true" weight="0.910066" />
+      <window_info anchor="bottom" id="Terminal" order="11" />
+      <window_info anchor="bottom" id="Python Console" order="12" weight="0.32920793" />
+>>>>>>> b4a65a44280e8ae07a113eb32fb29a79903ac252
       <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
       <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
       <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
@@ -349,6 +428,12 @@
   <component name="VcsContentAnnotationSettings">
     <option name="myLimit" value="2678400000" />
   </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="Created first draft for the CliffWorld task (6.9)&#10;&#10;-episodes are running and rewards are correctly accumulated&#10;-does not find goal state yet! (for less than 100 episodes)" />
+    <MESSAGE value="Made CliffWorld task workable&#10;&#10;-using equiprobable policy and 5000 episodes, map of q values shows what I would expect" />
+    <MESSAGE value="Tried some error fixing while accessing dictionary in matrix list. Not yet workable." />
+    <option name="LAST_COMMIT_MESSAGE" value="Tried some error fixing while accessing dictionary in matrix list. Not yet workable." />
+  </component>
   <component name="editorHistoryManager">
     <entry file="file://$PROJECT_DIR$/RL_UCB.py">
       <provider selected="true" editor-type-id="text-editor">
@@ -361,20 +446,43 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="-649">
           <caret line="228" column="4" selection-start-line="228" selection-start-column="4" selection-end-line="228" selection-end-column="4" />
+<<<<<<< HEAD
+=======
+        </state>
+      </provider>
+    </entry>
+    <entry file="file:///usr/lib/python3.6/copy.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="4773">
+          <caret line="131" column="4" selection-start-line="131" selection-start-column="4" selection-end-line="131" selection-end-column="4" />
+>>>>>>> b4a65a44280e8ae07a113eb32fb29a79903ac252
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/CliffWalking.py">
       <provider selected="true" editor-type-id="text-editor">
+<<<<<<< HEAD
         <state relative-caret-position="1755">
           <caret line="117" column="22" selection-start-line="117" selection-start-column="22" selection-end-line="117" selection-end-column="22" />
+=======
+        <state relative-caret-position="6512">
+          <caret line="181" column="24" selection-start-line="181" selection-start-column="24" selection-end-line="181" selection-end-column="24" />
+          <folding>
+            <element signature="e#0#27#0" expanded="true" />
+          </folding>
+>>>>>>> b4a65a44280e8ae07a113eb32fb29a79903ac252
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/Gridworld.py">
       <provider selected="true" editor-type-id="text-editor">
+<<<<<<< HEAD
         <state relative-caret-position="97">
           <caret line="68" column="29" lean-forward="true" selection-start-line="68" selection-start-column="29" selection-end-line="69" selection-end-column="40" />
+=======
+        <state relative-caret-position="1924">
+          <caret line="53" column="23" selection-start-line="53" selection-start-column="23" selection-end-line="53" selection-end-column="23" />
+>>>>>>> b4a65a44280e8ae07a113eb32fb29a79903ac252
           <folding>
             <element signature="e#0#12#0" expanded="true" />
           </folding>
@@ -383,6 +491,7 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/gridwalls.py">
       <provider selected="true" editor-type-id="text-editor">
+<<<<<<< HEAD
         <state relative-caret-position="380">
           <caret line="233" column="21" selection-start-line="233" selection-start-column="21" selection-end-line="233" selection-end-column="21" />
           <folding>
@@ -391,6 +500,14 @@
             <marker date="1540925555780" expanded="true" signature="3669:4252" ph="..." />
             <marker date="1540925555780" expanded="true" signature="4297:4306" ph="..." />
             <marker date="1540925555780" expanded="true" signature="4440:4446" ph="..." />
+=======
+        <state relative-caret-position="74">
+          <caret line="2" lean-forward="true" selection-start-line="2" selection-end-line="2" />
+          <folding>
+            <element signature="e#0#12#0" expanded="true" />
+            <marker date="1540923085461" expanded="true" signature="53:58" ph="..." />
+            <marker date="1540923085461" expanded="true" signature="834:835" ph="..." />
+>>>>>>> b4a65a44280e8ae07a113eb32fb29a79903ac252
           </folding>
         </state>
       </provider>

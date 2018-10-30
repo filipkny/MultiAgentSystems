@@ -10,23 +10,12 @@ class CliffWorld(object):
         self.goalReward = 10
         self.accumulatedReward = 0
         self.transitionCost = -1
-        self.policy = [[None]*10]*6 # [row][column]
         self.currentPosition = self.startState
         self.terminated = False
-        self.qValue = [[None]*10]*6
-        self.initPolicyRandom()
+        self.qValue = [[None for _ in range(10)] for _ in range(6)]
         self.initQvalues()
         self.alpha = 0.5
 
-    def initPolicyRandom(self):
-        for i in range(6):
-            for j in range(10):
-                self.policy[i][j] = {
-                    "north" : 0.25,
-                    "east" : 0.25,
-                    "south" : 0.25,
-                    "west" : 0.25
-                }
     def initQvalues(self):
         for i in range(6):
             for j in range(10):
@@ -37,19 +26,14 @@ class CliffWorld(object):
                     "west" : 0
                 }
 
-    def isTerminated(self):
-        if self.currentPosition in self.cliffStates:
-            self.terminated = True
-        elif self.currentPosition in self.goalState:
-            print("Found the goal state!")
-            self.terminated = True
-        return self.terminated
-
-    def policyMove(self):
-        directions = list(self.policy[self.currentPosition[0]][self.currentPosition[1]].keys())
-        probabilities = list(self.policy[self.currentPosition[0]][self.currentPosition[1]].values())
-        pMove = numpy.random.choice(directions, 1, p=probabilities)
-        return pMove
+    def e_greedy(self, position):
+        directions = list(self.qValue[position[0]][position[1]].keys())
+        equiprobablePolicy = [0.25, 0.25, 0.25, 0.25]
+        if numpy.random.choice(10, 1):
+            chosenDirection = numpy.random.choice(directions, 1, p=equiprobablePolicy)[0]
+            return [chosenDirection, self.qValue[position[0]][position[1]][chosenDirection]]
+        else:
+            return self.getOptimalQ(position)
 
     def getOptimalQ(self, position):
         currentBest = -10000000
@@ -62,7 +46,8 @@ class CliffWorld(object):
                 equals.append([direction, value])
         if len(equals) > 1:
             return random.choice(equals)
-        return [currentDirection, currentBest]
+        else:
+            return [currentDirection, currentBest]
 
     def move(self, direction):
         if direction == "north":
@@ -87,35 +72,42 @@ class CliffWorld(object):
 
     def playEpisode(self):
         self.currentPosition = self.startState
-        while not self.isTerminated():
-            #print(self.currentPosition)
-            previousPosition = self.currentPosition
-            direction = self.getOptimalQ(self.currentPosition)[0]
-            #direction = self.policyMove() how do we use this instead of optimalQ
-            #print("going " + direction)
+        e_greedy_move_onwards = self.e_greedy(self.currentPosition)
+
+        while not self.terminated:
+            previousPosition = [self.currentPosition[0], self.currentPosition[1]]
+            #For SARSA (updated a' from previous run)
+            direction = e_greedy_move_onwards[0]
+
+            #For Q-Learning
+            #direction = self.e_greedy(self.currentPosition)[0]
             self.move(direction) # updates currentPosition!
-            reward = -1
+            reward = self.transitionCost
             if self.currentPosition in self.cliffStates:
-                reward = -100
+                reward = self.cliffReward
+                self.terminated = True
             elif self.currentPosition == self.goalState:
-                reward = 10
+                reward = self.goalReward
+                self.terminated = True
             self.accumulatedReward += reward
-            #print("new values")
-            #print(self.qValue[previousPosition[0]][previousPosition[1]][direction])
-            #print(self.getOptimalQ(self.currentPosition)[1])
-            self.qValue[previousPosition[0]][previousPosition[1]][direction] += self.alpha * (reward + self.getOptimalQ(self.currentPosition)[1] - self.qValue[previousPosition[0]][previousPosition[1]][direction])
-            #print(self.qValue[previousPosition[0]][previousPosition[1]][direction])
+
+            #Q-LEARNING
+            #self.qValue[previousPosition[0]][previousPosition[1]][direction] += self.alpha * (reward + self.getOptimalQ(self.currentPosition)[1] - self.qValue[previousPosition[0]][previousPosition[1]][direction])
+
+            #SARSA
+            e_greedy_move_onwards = self.e_greedy(self.currentPosition)
+            self.qValue[previousPosition[0]][previousPosition[1]][direction] += self.alpha * (reward + e_greedy_move_onwards[1] - self.qValue[previousPosition[0]][previousPosition[1]][direction])
 
     def QLearning(self):
-        for i in range(100):
+        for episode in range(3000):
             self.terminated = False
-            self.currentPosition = self.startState
             self.accumulatedReward = 0
             self.playEpisode()
-            #print("final " + str(example.accumulatedReward))
+
 
 example = CliffWorld()
-#example.playEpisode()
 example.QLearning()
-print("final " + str(example.accumulatedReward))
-print(example.qValue)
+# Use this to print the final grid
+#for row in range(6):
+#    for column in range(10):
+#        print("[" + str(row) + ", " + str(column) + "] :" + str(example.qValue[row][column]))
