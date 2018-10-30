@@ -29,7 +29,7 @@ class CliffWorld(object):
     def e_greedy(self, position):
         directions = list(self.qValue[position[0]][position[1]].keys())
         equiprobablePolicy = [0.25, 0.25, 0.25, 0.25]
-        if numpy.random.choice(10, 1):
+        if numpy.random.choice(100, 1)[0] == 1:
             chosenDirection = numpy.random.choice(directions, 1, p=equiprobablePolicy)[0]
             return [chosenDirection, self.qValue[position[0]][position[1]][chosenDirection]]
         else:
@@ -40,9 +40,11 @@ class CliffWorld(object):
         equals = []
         currentDirection = ""
         for direction, value in list(self.qValue[position[0]][position[1]].items()):
-            if value >= currentBest:
+            if value > currentBest:
                 currentBest = value
                 currentDirection = direction
+        for direction, value in list(self.qValue[position[0]][position[1]].items()):
+            if value == currentBest:
                 equals.append([direction, value])
         if len(equals) > 1:
             return random.choice(equals)
@@ -69,6 +71,15 @@ class CliffWorld(object):
             if self.currentPosition[1] == 0:
                 return
             self.currentPosition = [self.currentPosition[0], self.currentPosition[1] - 1]
+
+    def printOptimalPath(self):
+        self.currentPosition = self.startState
+        self.terminated = False
+        while not self.terminated:
+            print(self.currentPosition)
+            self.move(self.getOptimalQ(self.currentPosition)[0])
+            if self.currentPosition in self.cliffStates or self.currentPosition == self.goalState:
+                self.terminated = True
 
     def playEpisode(self):
         self.currentPosition = self.startState
@@ -99,7 +110,7 @@ class CliffWorld(object):
             self.qValue[previousPosition[0]][previousPosition[1]][direction] += self.alpha * (reward + e_greedy_move_onwards[1] - self.qValue[previousPosition[0]][previousPosition[1]][direction])
 
     def QLearning(self):
-        for episode in range(3000):
+        for episode in range(500):
             self.terminated = False
             self.accumulatedReward = 0
             self.playEpisode()
@@ -108,6 +119,7 @@ class CliffWorld(object):
 example = CliffWorld()
 example.QLearning()
 # Use this to print the final grid
-#for row in range(6):
-#    for column in range(10):
-#        print("[" + str(row) + ", " + str(column) + "] :" + str(example.qValue[row][column]))
+for row in range(6):
+    for column in range(10):
+        print("[" + str(row) + ", " + str(column) + "] :" + str(example.qValue[row][column]))
+example.printOptimalPath()
