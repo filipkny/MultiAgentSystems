@@ -149,12 +149,12 @@ class Gridwall(object):
         else:
             return True
 
-    def generate_episode(self, algorithm = 'sarsa', printing=True):
+    def generate_episode(self, algorithm = 'sarsa', printing=True, e = 0.1):
 
         # Initialize s
         self.init_agent()
         # Choose a from s using policy derived from Q, e-greedy
-        dir = self.agent.select_e_greedily(self.agent.current_pos, self.Qmat)
+        dir = self.agent.select_e_greedily(self.agent.current_pos, self.Qmat, e = e)
 
         counter = 0
 
@@ -176,7 +176,7 @@ class Gridwall(object):
 
 
             # Choose a' from s' using policy derived from Q, e-greedy
-            new_dir = self.agent.select_e_greedily(s_slash, self.Qmat)
+            new_dir = self.agent.select_e_greedily(s_slash, self.Qmat, e = e)
             [new_y, new_x] = s_slash
 
             if algorithm == 'sarsa':
@@ -233,7 +233,7 @@ world.init_policies()
 world.init_Qmat()
 for i in range(100000):
     print("Episode {}".format(i))
-    world.generate_episode(algorithm='q',printing=False)
+    world.generate_episode(e=1./(1+i),algorithm='q',printing=False)
    # world.print_best_policies()
 
 qmat = world.print_final_policies()
