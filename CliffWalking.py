@@ -1,5 +1,6 @@
 import numpy
 import random
+import copy
 
 class CliffWorld(object):
     def __init__(self):
@@ -30,19 +31,11 @@ class CliffWorld(object):
     def initQvalues(self):
         for i in range(6):
             for j in range(10):
-                self.qValue[i][j] = {
-                    "north" : 0,
-                    "east" : 0,
+                temporary = {"north" : i,
+                    "east" : j,
                     "south" : 0,
-                    "west" : 0
-                }
-
-    def isTerminated(self):
-        if self.currentPosition in self.cliffStates:
-            self.terminated = True
-        elif self.currentPosition == self.goalState:
-            self.terminated = True
-        return self.terminated
+                    "west" : 0}
+                self.qValue[i][j] = copy.deepcopy(temporary)
 
     def policyMove(self):
         directions = list(self.policy[self.currentPosition[0]][self.currentPosition[1]].keys())
@@ -61,7 +54,8 @@ class CliffWorld(object):
                 equals.append([direction, value])
         if len(equals) > 1:
             return random.choice(equals)
-        return [currentDirection, currentBest]
+        else:
+            return [currentDirection, currentBest]
 
     def move(self, direction):
         if direction == "north":
@@ -86,27 +80,44 @@ class CliffWorld(object):
 
     def playEpisode(self):
         self.currentPosition = self.startState
-        while not self.isTerminated():
+        while not self.terminated:
             previousPosition = [self.currentPosition[0], self.currentPosition[1]]
             direction = self.policyMove()
             self.move(direction) # updates currentPosition!
+            print(previousPosition)
+            print(self.currentPosition)
             reward = -1
             if self.currentPosition in self.cliffStates:
                 reward = -100
+                self.terminated = True
             elif self.currentPosition == self.goalState:
                 reward = 10
+                self.terminated = True
             self.accumulatedReward += reward
-            self.qValue[previousPosition[0]][previousPosition[1]][direction] += self.alpha * (reward + self.getOptimalQ(self.currentPosition)[1] - self.qValue[previousPosition[0]][previousPosition[1]][direction])
+
+            print(previousPosition[0])
+            print(previousPosition[1])
+            print(direction)
+
+            for row in range(6):
+                for column in range(10):
+                    print("[" + str(row) + ", " + str(column) + "] :" + str(example.qValue[row][column]))
+            print(self.qValue[3][1])
+            self.qValue[3][1].update(north = 3) # Why does this update all [x][1] with north = 3?!
+            #self.qValue[previousPosition[0]][previousPosition[1]][direction] = self.qValue[previousPosition[0]][previousPosition[1]][direction] +  self.alpha * (reward + self.getOptimalQ(self.currentPosition)[1] - self.qValue[previousPosition[0]][previousPosition[1]][direction])
+
+            for row in range(6):
+                for column in range(10):
+                    print("[" + str(row) + ", " + str(column) + "] :" + str(example.qValue[row][column]))
 
     def QLearning(self):
-        for episode in range(5000):
+        for episode in range(1):
             self.terminated = False
             self.accumulatedReward = 0
             self.playEpisode()
 
+
 example = CliffWorld()
 example.QLearning()
 print("final q values")
-for row in range(6):
-    for column in range(10):
-        print("[" + str(row) + ", " + str(column) + "] :" + str(example.qValue[row][column]))
+print(example.qValue)
