@@ -61,16 +61,15 @@ class Agent(object):
             dir = random.choice(list(choices.keys()))
         else:
             max_q = -sys.maxsize
-            best_moves = []
+            best_move = None
             # Select best move
             for direction in choices.keys():
                 q = choices[direction]
                 if q >= max_q:
                     max_q = q
-                    max_dir  = direction
-                    best_moves.append(direction)
+                    best_move = direction
 
-            dir = random.choice(best_moves)
+            dir = best_move
 
         return dir
 

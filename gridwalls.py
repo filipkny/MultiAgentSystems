@@ -6,7 +6,7 @@ import sys
 from collections import defaultdict
 
 class Gridwall(object):
-    def __init__(self,walls, treasure, snake_pit,size=8, alfa=0.1, gamma = 1):
+    def __init__(self,walls, treasure, snake_pit,size=8, alfa=0.5, gamma = 1):
         self.size = size
         self.walls = walls
         self.treasure = treasure
@@ -67,25 +67,11 @@ class Gridwall(object):
             self.Qmat.append([])
             for x in range(self.size):
                 self.Qmat[y].append({
-                    'north':0,
-                    'south': 0,
-                    'east': 0,
-                    'west': 0,
+                    'north':0.,
+                    'south': 0.,
+                    'east': 0.,
+                    'west': 0.,
                 })
-
-        self.Qmat[self.treasure[0]][self.treasure[1]] = {
-            'north': 0,
-            'south': 0,
-            'east': 0,
-            'west': 0,
-        }
-
-        self.Qmat[self.snake_pit[0]][self.snake_pit[1]] = {
-            'north': 0,
-            'south': 0,
-            'east': 0,
-            'west': 0,
-        }
 
     def get_tile_in_direction(self,pos, dir):
         new_pos = copy.deepcopy(pos)
@@ -118,7 +104,7 @@ class Gridwall(object):
                         max_dir = dir
 
                 best_policies[y].append(max_dir)
-                sum_best_policies[y].append(round(sum(choices.values()),2))
+                sum_best_policies[y].append(round(max(choices.values()),1))
 
         best_policies = np.matrix(best_policies)
 
@@ -141,7 +127,7 @@ class Gridwall(object):
         print(best_policies)
         print(sum_best_policies)
 
-        return self.Qmat
+        return self.Qmat,best_policies,sum_best_policies
 
     def check_bump(self, pos, walls, border = 8):
         if pos not in walls and 0 <= pos[0] < border  and 0 <= pos[1] < border:
@@ -149,19 +135,80 @@ class Gridwall(object):
         else:
             return True
 
-    def generate_episode(self, algorithm = 'sarsa', printing=True, e = 0.1):
+
+    def generate_episode_qlearn(self, printing=True, e = 0.1):
 
         # Initialize s
         self.init_agent()
+
+        counter = 0
+
+        # Repeat for each step
+        while self.agent.current_pos != self.snake_pit or self.agent.current_pos != self.treasure:
+            counter += 1
+            [current_y, current_x] = copy.deepcopy(self.agent.current_pos)
+
+            dir = self.agent.select_e_greedily(self.agent.current_pos, self.Qmat, e=e)
+            s_slash = self.get_tile_in_direction(self.agent.current_pos, dir)
+
+            if printing:
+                print(" --------- NEW STEP ----------")
+                print("Agent at {} with dir: {} --> {}".format(self.agent.current_pos, dir, s_slash))
+
+            # Take action a, observe reward, s'
+            bumped = self.check_bump(s_slash, self.walls)
+            if bumped:
+                s_slash = self.agent.current_pos
+            reward = self.check_reward(s_slash, bumped)
+
+            # Choose a' from s' using policy derived from Q, e-greedy
+            new_dir = self.agent.select_e_greedily(s_slash, self.Qmat, e=e)
+            [new_y, new_x] = s_slash
+
+            [update_y, update_x] = [new_y, new_x]
+            update_dir = self.agent.select_e_greedily(s_slash, self.Qmat, e=0)
+
+            if printing:
+                print("Recieved reward {} (bumped at {}: {})".format(reward, self.agent.current_pos, bumped))
+
+            if printing:
+                print("a_slash is {}".format(new_dir))
+
+            # Update Q
+            self.Qmat[current_y][current_x][dir] += self.alfa * \
+                                                    (reward + self.gamma * self.Qmat[update_y][update_x][update_dir] -
+                                                     self.Qmat[current_y][current_x][dir])
+
+            if printing:
+                print("After updating Q for y:{} and x:{} it looks like:{}".format(current_y, current_x,
+                                                                                   self.Qmat[current_y][current_x]))
+                print("Updating with {}".format(self.alfa * \
+                                                (reward + self.gamma * self.Qmat[update_y][update_x][update_dir] -
+                                                 self.Qmat[current_y][current_x][dir])))
+            dir = new_dir
+            self.agent.current_pos = s_slash
+
+            if printing:
+                print("Now at {}".format(self.agent.current_pos))
+
+            if self.agent.current_pos == self.snake_pit or self.agent.current_pos == self.treasure:
+                break
+
+
+    def generate_episode_sarsa(self,algorithm='sarsa' ,printing=True, e = 0.1):
+
+        # Initialize s
+        self.init_agent()
+
         # Choose a from s using policy derived from Q, e-greedy
         dir = self.agent.select_e_greedily(self.agent.current_pos, self.Qmat, e = e)
 
         counter = 0
 
         # Repeat for each step
-        while True:
+        while self.agent.current_pos != self.snake_pit and self.agent.current_pos != self.treasure:
             counter += 1
-            [current_y, current_x] = self.agent.current_pos
+            [current_y, current_x] = copy.deepcopy(self.agent.current_pos)
 
             s_slash = self.get_tile_in_direction(self.agent.current_pos, dir)
             if printing:
@@ -179,40 +226,39 @@ class Gridwall(object):
             new_dir = self.agent.select_e_greedily(s_slash, self.Qmat, e = e)
             [new_y, new_x] = s_slash
 
+            [update_y, update_x] = [new_y, new_x]
             if algorithm == 'sarsa':
                 update_dir = new_dir
-                [update_y, update_x] = [new_y, new_x]
             else:
-                update_dir = self.agent.select_e_greedily(s_slash, self.Qmat, e=0)
-                [update_y, update_x] = s_slash
+                update_dir = self.agent.select_e_greedily(s_slash,self.Qmat, e = 0)
 
 
             if printing:
                 print("Recieved reward {} (bumped at {}: {})".format(reward,self.agent.current_pos,bumped))
 
-
-            if printing:
+                print("Update formula Q(s,a) += {}*({} + {}*{} - {}) = ".format(self.alfa, reward, self.gamma,
+                                                                                self.Qmat[update_y][update_x][
+                                                                                    update_dir],
+                                                                                self.Qmat[current_y][current_x][dir]))
                 print("a_slash is {}".format(new_dir))
+
 
             # Update Q
             self.Qmat[current_y][current_x][dir] += self.alfa*\
-                                              (reward + self.gamma*self.Qmat[update_y][update_x][update_dir] -
-                                               self.Qmat[current_y][current_x][dir])
+                                              (reward + self.gamma*self.Qmat[update_y][update_x][update_dir] - self.Qmat[current_y][current_x][dir])
 
 
             if printing:
                 print("After updating Q for y:{} and x:{} it looks like:{}".format(current_y,current_x,self.Qmat[current_y][current_x]))
                 print("Updating with {}".format(self.alfa*\
-                                              (reward + self.gamma*self.Qmat[update_y][update_x][update_dir] -
-                                               self.Qmat[current_y][current_x][dir])))
+                                              (reward + self.gamma*self.Qmat[update_y][update_x][update_dir] - self.Qmat[current_y][current_x][dir])))
             dir = new_dir
             self.agent.current_pos = s_slash
 
             if printing:
                 print("Now at {}".format(self.agent.current_pos))
 
-            if self.agent.current_pos == self.snake_pit or self.agent.current_pos == self.treasure:
-                break
+
 
 walls = [[1,2],
          [1,3],
@@ -231,9 +277,24 @@ snake_pit = [5,4]
 world = Gridwall(walls,treasure,snake_pit)
 world.init_policies()
 world.init_Qmat()
-for i in range(100000):
+for i in range(10000):
     print("Episode {}".format(i))
-    world.generate_episode(e=1./(1+i),algorithm='q',printing=False)
+    world.generate_episode_sarsa(algorithm='sarsa',e=1/(i+1), printing=False)
+
    # world.print_best_policies()
 
-qmat = world.print_final_policies()
+qmat,best_p,best_qs = world.print_final_policies()
+
+import numpy as np
+import seaborn as sns
+import matplotlib.pyplot as plt
+print(best_qs.shape)
+for wall in walls:
+    best_qs[wall[0],wall[1]] = -20
+
+best_qs[treasure[0],treasure[1]] = -20
+best_qs[snake_pit[0],snake_pit[1]] = -20
+
+ax = sns.heatmap(best_qs, annot=True)
+plt.show()
+
