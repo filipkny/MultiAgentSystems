@@ -29,7 +29,7 @@ class CliffWorld(object):
     def e_greedy(self, position):
         directions = list(self.qValue[position[0]][position[1]].keys())
         equiprobablePolicy = [0.25, 0.25, 0.25, 0.25]
-        if numpy.random.choice(1000, 1)[0] == 1:
+        if numpy.random.choice(10, 1)[0] == 1:
             chosenDirection = numpy.random.choice(directions, 1, p=equiprobablePolicy)[0]
             return [chosenDirection, self.qValue[position[0]][position[1]][chosenDirection]]
         else:
@@ -72,14 +72,20 @@ class CliffWorld(object):
                 return
             self.currentPosition = [self.currentPosition[0], self.currentPosition[1] - 1]
 
-    def printOptimalPath(self):
-        self.currentPosition = self.startState
-        self.terminated = False
-        while not self.terminated:
-            print(self.currentPosition)
-            self.move(self.getOptimalQ(self.currentPosition)[0])
-            if self.currentPosition in self.cliffStates or self.currentPosition == self.goalState:
-                self.terminated = True
+    def printOptimalPolicy(self):
+        for row in range(6):
+            line_print = "["
+            for column in range(10):
+                currentBest = -1000000
+                direction = ""
+                for pair in self.qValue[row][column].items():
+                    if currentBest < pair[1]:
+                        currentBest = pair[1]
+                        direction = pair[0]
+                if currentBest == 0:
+                    direction = "-"
+                line_print += direction + ", "
+            print(line_print + "]")
 
     def playEpisode(self):
         self.currentPosition = self.startState
@@ -88,10 +94,10 @@ class CliffWorld(object):
         while not self.terminated:
             previousPosition = [self.currentPosition[0], self.currentPosition[1]]
             #For SARSA (updated a' from previous run)
-            direction = e_greedy_move_onwards[0]
+            #direction = e_greedy_move_onwards[0]
 
             #For Q-Learning
-            #direction = self.e_greedy(self.currentPosition)[0]
+            direction = self.e_greedy(self.currentPosition)[0]
             self.move(direction) # updates currentPosition!
             reward = self.transitionCost
             if self.currentPosition in self.cliffStates:
@@ -103,14 +109,14 @@ class CliffWorld(object):
             self.accumulatedReward += reward
 
             #Q-LEARNING
-            #self.qValue[previousPosition[0]][previousPosition[1]][direction] += self.alpha * (reward + self.getOptimalQ(self.currentPosition)[1] - self.qValue[previousPosition[0]][previousPosition[1]][direction])
+            self.qValue[previousPosition[0]][previousPosition[1]][direction] += self.alpha * (reward + self.getOptimalQ(self.currentPosition)[1] - self.qValue[previousPosition[0]][previousPosition[1]][direction])
 
             #SARSA
-            e_greedy_move_onwards = self.e_greedy(self.currentPosition)
-            self.qValue[previousPosition[0]][previousPosition[1]][direction] += self.alpha * (reward + e_greedy_move_onwards[1] - self.qValue[previousPosition[0]][previousPosition[1]][direction])
+            #e_greedy_move_onwards = self.e_greedy(self.currentPosition)
+            #self.qValue[previousPosition[0]][previousPosition[1]][direction] += self.alpha * (reward + e_greedy_move_onwards[1] - self.qValue[previousPosition[0]][previousPosition[1]][direction])
 
     def QLearning(self):
-        for episode in range(500):
+        for episode in range(5000):
             self.terminated = False
             self.accumulatedReward = 0
             self.playEpisode()
@@ -118,8 +124,8 @@ class CliffWorld(object):
 
 example = CliffWorld()
 example.QLearning()
-# Use this to print the final grid
-for row in range(6):
-    for column in range(10):
-        print("[" + str(row) + ", " + str(column) + "] :" + str(example.qValue[row][column]))
-example.printOptimalPath()
+# Use this to print the final grid state by state
+# for row in range(6):
+#     for column in range(10):
+#         print("[" + str(row) + ", " + str(column) + "] :" + str(example.qValue[row][column]))
+example.printOptimalPolicy()
